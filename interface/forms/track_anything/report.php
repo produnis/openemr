@@ -1,0 +1,219 @@
+<?php
+/**
+* Encounter form to track any clinical parameter.
+*
+* Copyright (C) 2014 Joe Slam <trackanything@produnis.de>
+*
+* LICENSE: This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://opensource.org/licenses/gpl-license.php>.
+*
+* @package OpenEMR
+* @author Joe Slam <trackanything@produnis.de>
+*/
+$sanitize_all_escapes  = true;
+$fake_register_globals = false;
+require_once("../../globals.php");
+include_once($GLOBALS["srcdir"] . "/api.inc");
+
+echo "<html><head>";
+// bring the stylesheets
+// Some Javascript support and Javascript-functions
+//******* **********************************
+?> 
+<link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css">
+<link rel="stylesheet" href="<?php echo $web_root; ?>/interface/forms/track_anything/style.css" type="text/css"> 
+<script type="text/javascript" src="<?php echo $web_root; ?>/library/js/jquery.1.3.2.js"></script>
+<script type="text/javascript" src="<?php echo $web_root; ?>/library/openflashchart/js/json/json2.js"></script>
+<script type="text/javascript" src="<?php echo $web_root; ?>/library/openflashchart/js/swfobject.js"></script>
+<script type="text/javascript">
+//-------------- checkboxes checked checker --------------------
+// Pass the checkbox name to the function
+function getCheckedBoxes(chkboxName) {
+  var checkboxes = document.getElementsByName(chkboxName);
+  var checkedValue = [];
+  // loop over them all
+  for (var i=0; i<checkboxes.length; i++) {
+     // And stick the checked ones onto an array...
+     if (checkboxes[i].checked) {
+        checkedValue.push(checkboxes[i].value);
+     }
+  }
+  return checkedValue; 
+}
+//---------------------------------------------------------------
+
+// set up flashvars for ofc
+var flashvars = {};
+var data;
+
+// -------------------------
+// this is automatically called by swfobject.embedSWF()
+//------------------------------------------------------
+function open_flash_chart_data(){
+	return JSON.stringify(data);
+}
+//------------------------------------------------------
+</script>
+<?php  
+echo "</head><body class='body_top'>";
+
+function track_anything_report( $pid, $encounter, $cols, $id){
+	require_once("../../globals.php");
+	echo "<div id='track_anything'>";
+	global $web_root;
+	$ofc_name = array();
+	$ofc_date = array();
+	$ofc_value = array();
+	$row = 0; // how many rows
+	$col = 0; // how many Items per row	
+	$dummy = array(); // counter to decide if graph-button is shown
+	$formid = $id;
+	$shownameflag = 0;	
+	echo "<div id='graph" . $formid . "'> </div><br>";
+	echo "<table border='1'>";
+
+	// get name of selected track, used for GraphTitle
+	$spruch  = "SELECT procedure_type.name AS track_name ";
+	$spruch .= "FROM form_track_anything "; 
+	$spruch .= "INNER JOIN procedure_type ON form_track_anything.procedure_type_id = procedure_type.procedure_type_id ";
+	$spruch .= "WHERE id = ?";
+	$query = sqlStatement($spruch, array($formid));
+	$myrow = sqlFetchArray($query);
+	$the_track_name = $myrow["track_name"];
+	//------------
+
+	// get correct track
+	$pruch  = "SELECT DISTINCT track_timestamp ";
+	$pruch .= "FROM form_track_anything_results ";
+	$pruch .= "WHERE track_anything_id = ? ";
+	$pruch .= "ORDER BY track_timestamp DESC ";
+	$query = sqlStatement($pruch, array($formid));
+	
+	// get all data of this specific track
+	while($myrow = sqlFetchArray($query)){ 
+		$thistime = $myrow['track_timestamp'];
+		$shownameflag++;		
+		$spruch  = "SELECT form_track_anything_results.itemid, form_track_anything_results.result, procedure_type.name AS der_name ";
+		$spruch .= "FROM form_track_anything_results ";
+		$spruch .= "INNER JOIN procedure_type ON form_track_anything_results.itemid = procedure_type.procedure_type_id ";
+		$spruch .= "WHERE track_anything_id = ? AND track_timestamp = ? ";
+		$spruch .= "ORDER BY der_name ASC ";
+		$query2  = sqlStatement($spruch, array($formid, $thistime));
+		
+		// is this the <tbale>-head?
+		if ($shownameflag==1){
+			echo "<tr><th class='time'>Time</td>";
+			while($myrow2 = sqlFetchArray($query2)){
+				echo "<th class='item'>&nbsp;" . $myrow2['der_name'] . "&nbsp;</td>";		
+				$ofc_name[$col] = $myrow2['der_name']; // save for openflashchart-form
+				$col++;
+			}
+			echo "</tr>";		
+		}
+		
+		// post data entries per row
+		echo "<tr><td class='time'>" . $thistime. "</td>";	
+		$ofc_date[$row] = $thistime; // save for openflashchart-form			
+		$col_i = 0; // how many columns
+		$query2  = sqlStatement($spruch, array($formid, $thistime));
+		while($myrow2 = sqlFetchArray($query2)){
+			echo "<td class='item'>&nbsp;" . $myrow2['result'] . "&nbsp;</td>";
+			if (is_numeric($myrow2['result'])) {
+					$ofc_value[$col_i][$row] = $myrow2['result'];// save for openflashchart-form
+			}
+			$col_i++;
+		} 
+		echo "</tr>";
+		$row++;
+	}
+
+	// Graph-Button row
+	echo "<tr>";
+	echo "<td class='check'>Check items to graph</td>"; 
+	for ($col_i = 0; $col_i < $col; $col_i++){
+		echo "<td class='check'>";
+		for ($row_b=0; $row_b <$row; $row_b++) {
+			// count more than 1 to show graph-button
+			if(is_numeric($ofc_value[$col_i][$row_b])){ $dummy[$col_i]++; 
+			}
+		}
+		// show graph-button only if we have more than 1 valid data
+		if ($dummy[$col_i] > 1){ 
+			echo "<input type='checkbox' name='check_col" . $formid . "' value='" . $col_i . "'>";
+			$showbutton++;
+		}
+		echo "</td>";
+	}
+	echo "</tr>";
+
+	if($showbutton>0){
+		echo "<tr><td></td>";
+		echo "<td colspan='" . $col . "'>";
+		echo "<input type='button' class='graph_button' ";
+		echo " onclick='plot_graph" . $formid ."()' ";
+		echo "name='' value='Plot selected Items'>";
+		echo "</td></tr>";
+		}
+	//---/end graph button------------------
+	echo "</table>";	
+	echo "<br>";
+
+	echo "<form method='post' action='../../forms/track_anything/history.php' onsubmit='return top.restoreSession()'>"; 
+	echo "<input type='hidden' name='formid' value='". $formid . "'>";
+	echo "<input type='submit' name='history' value='Show track history' />";
+	echo "</form>";
+?>
+<script>
+// plot the current graph
+// this function is located here, as now all data-arrays are ready
+//-----------------------------------------------------------------
+function plot_graph<?php echo $formid ?>(){
+	//alert("get graph");
+	top.restoreSession();
+	var checkedBoxes = JSON.stringify(getCheckedBoxes("check_col<?php echo $formid; ?>"));
+	var theitems = JSON.stringify(<?php echo json_encode($ofc_name) ?>);
+	var thetrack = JSON.stringify("<?php echo $the_track_name . " [Track " . $formid . "]" ?>");
+	var thedates = JSON.stringify(<?php echo json_encode($ofc_date) ?>);
+	var thevalues = JSON.stringify(<?php echo json_encode($ofc_value) ?>);
+	
+	$.ajax({ url: '<?php echo $web_root; ?>/library/openflashchart/graph_track_anything.php',
+		     type: 'POST',
+		     data: { dates:  thedates, 
+				     values: thevalues, 
+				     items:  theitems, 
+				     track:  thetrack, 
+				     thecheckboxes: checkedBoxes
+				   },
+			 dataType: "json",  
+			 success: function(returnData){
+				 // ofc will look after a variable named "ofc"
+				 // inside of the flashvars
+				 // However, we need to set both
+				 // data and flashvars.ofc 
+				 data=returnData;
+				 flashvars.ofc = returnData;
+				 // call ofc with proper falshchart
+					swfobject.embedSWF('<?php echo $web_root; ?>/library/openflashchart/open-flash-chart.swf', 
+					"graph<?php echo $formid ?>", "650", "200", "9.0.0","",flashvars);  
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				alert(XMLHttpRequest.responseText);
+				//alert("XMLHttpRequest="+XMLHttpRequest.responseText+"\ntextStatus="+textStatus+"\nerrorThrown="+errorThrown);
+			}
+	
+	}); // end ajax query	
+}
+//------------------------------------------------------
+</script>
+</div>
+<?php
+}// end function track_anything_report
+?>

@@ -1,0 +1,55 @@
+.graph {color:#0000cc;}
+
+.graph_button{
+	font:11px Arial,Helvetica,sans-serif;
+	cursor: pointer;
+	color:#000000;
+	background-color:#d3d7cf; 
+}
+  
+
+#track_anything table{
+	border:1px solid black;
+}
+
+#track_anything td.menu{
+	font:11px Arial,Helvetica,sans-serif;
+}
+ 
+
+#track_anything th.time{
+	font:15px Arial,Helvetica,sans-serif;
+	background-color:#888a85;
+	text-align:center;
+	color:white;
+	font-weight:bold;
+}
+#track_anything td.time{
+	font:13px Arial,Helvetica,sans-serif;
+	background-color:#eeeeec;
+	color:black;
+}
+ 
+	 
+#track_anything th.item{
+	font:15px Arial,Helvetica,sans-serif;
+	background-color:#89A7D6; 
+	text-align:center;
+	color:white;
+	font-weight:bold;
+}
+
+
+#track_anything td.item{
+	font:13px Arial,Helvetica,sans-serif;
+	background-color:#D3E1ED;
+	color:black;
+	text-align:right;
+}
+ 
+#track_anything td.check{
+	font:13px Arial,Helvetica,sans-serif;
+	background-color:#d3d7cf;
+	color:black;
+}
+ 
