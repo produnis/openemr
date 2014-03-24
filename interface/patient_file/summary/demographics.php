@@ -346,6 +346,8 @@ $(document).ready(function(){
     $("#vitals_ps_expand").load("vitals_fragment.php");
 <?php } ?>
 
+    // Initialize labdata
+    $("#labdata_ps_expand").load("labdata_fragment.php");
 <?php
   // Initialize for each applicable LBF form.
   $gfres = sqlStatement("SELECT option_id FROM list_options WHERE " .
@@ -980,6 +982,43 @@ expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel,
      </td>
     </tr>
 <?php } // end if ($vitals_is_registered && acl_check('patients', 'med')) ?>
+
+
+ <?php // labdata ?>
+    <tr>
+     <td width='650px'>
+<?php // labdata expand collapse widget
+  $widgetTitle = xl("LabData");
+  $widgetLabel = "labdata";
+  $widgetButtonLabel = xl("Trend");
+  $widgetButtonLink = "../summary/labdata.php";#"../encounter/trend_form.php?formname=labdata";
+  $widgetButtonClass = "";
+  $linkMethod = "html";
+  $bodyClass = "notab";
+  // check to see if any labdata exist
+  $spruch = "SELECT procedure_report.date_collected AS date " .
+			"FROM procedure_report " . 
+			"JOIN procedure_order ON  procedure_report.procedure_order_id = procedure_order.procedure_order_id " . 
+			"WHERE procedure_order.patient_id = ? " . 
+			"ORDER BY procedure_report.date_collected DESC ";
+  $existLabdata = sqlQuery($spruch, array($pid) );	
+  if ($existLabdata) {
+    $widgetAuth = true;
+  }
+  else {
+    $widgetAuth = false;
+  }
+  $fixedWidth = true;
+  expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel,
+    $widgetButtonLink, $widgetButtonClass, $linkMethod, $bodyClass,
+    $widgetAuth, $fixedWidth);
+?>
+      <br/>
+      <div style='margin-left:10px' class='text'><img src='../../pic/ajax-loader.gif'/></div><br/>
+      </div>
+     </td>
+    </tr>
+<?php  // end labdata ?>
 
 <?php
   // This generates a section similar to Vitals for each LBF form that
