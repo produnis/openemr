@@ -19,9 +19,9 @@
 
 #track_anything th.time{
 	font:15px Arial,Helvetica,sans-serif;
-	background-color:#888a85;
+	background-color:#d3d7cf;
 	text-align:center;
-	color:white;
+	color:black;
 	font-weight:bold;
 }
 #track_anything td.time{
@@ -33,16 +33,25 @@
 	 
 #track_anything th.item{
 	font:15px Arial,Helvetica,sans-serif;
-	background-color:#89A7D6; 
+	background-color:#B8CCE4; 
 	text-align:center;
-	color:white;
+	color:black;
+	font-weight:bold;
+}
+
+	 
+#track_anything th.value{
+	font:15px Arial,Helvetica,sans-serif;
+	background-color:#DEE5F1; 
+	text-align:center;
+	color:black;
 	font-weight:bold;
 }
 
 
 #track_anything td.item{
 	font:13px Arial,Helvetica,sans-serif;
-	background-color:#D3E1ED;
+	background-color:#DEE5F1;
 	color:black;
 	text-align:right;
 }

@@ -42,9 +42,12 @@ if (!$formid){
 $myprocedureid =  $_POST['procedure2track'];
 
 echo "<html><head>";
-?> <link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css"> <?php  
+?> 
+<link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css">
+<link rel="stylesheet" href="<?php echo $web_root; ?>/interface/forms/track_anything/style.css" type="text/css">  
+<?php  
 echo "</head><body class='body_top'>";
-
+echo "<div id='track_anything'>";
 
 // check if this Track is new
 if (!$formid){
@@ -67,11 +70,14 @@ if (!$formid){
 
 	}else{
 	// procedure is not yet selected
-
-		echo "Select procedure to track:";
+		echo "<table>";
+		echo "<tr>";
+		echo "<th>Select procedure to track:</th>";
+		echo "</tr><tr>";
+		echo "<td>";
 		echo "<form method='post' action='" . $rootdir . "/forms/track_anything/new.php' onsubmit='return top.restoreSession()'>"; 
 
-		echo "<select name='procedure2track' size='10'>";
+		echo "<select name='procedure2track' size='10' style='width: 300px'>";
 		$testi = sqlStatement("SELECT * FROM procedure_type WHERE parent = 0 ORDER BY name ASC ");
 		while($myrow = sqlFetchArray($testi)){ 
 			$myprocedureid = $myrow["procedure_type_id"];
@@ -79,9 +85,12 @@ if (!$formid){
 			echo "<option value='" . $myprocedureid . "'>" . $myprocedurename . "</option>";
 		}
 		echo "</select>";
+		echo "</td></tr><tr><td align='center'>";
 		echo "<input type='submit' name='bn_select' value='select' />";
 ?><input type='button' value='Back' onclick="top.restoreSession();location='<?php echo $GLOBALS['form_exit_url']; ?>'" /><?php
 		echo "</form>";
+		echo "</td></tr>";
+		echo "</table>";
 	}
 
 }
@@ -163,10 +172,11 @@ if ($formid){
 			$myprocedureid = $myrow["procedure_type_id"];
 		}
 	}
-
+	echo "<br><b>Enter new data</b>:<br>";
 	echo "<form method='post' action='" . $rootdir . "/forms/track_anything/new.php' onsubmit='return top.restoreSession()'>"; 
 	echo "<table>";
-	echo "<tr><td><b>Item</b></td><td><b>Value</b></td></tr>";
+	echo "<tr><th class='item'>Item</th>";
+	echo "<th class='value'>Value</th></tr>";
 	echo "<tr><td>Date Time</td>  <td><input size='12' name='datetime' value='" . date('Y-m-d H:i:s', time()) . "'></td></tr>";
 	
 	
@@ -189,7 +199,8 @@ if ($formid){
 	// show old entries of track
 	//-----------------------------------
 	// get unique timestamps of track
-
+	echo "<br><br><hr><br>";
+	echo "<b>Edit your entered data:</b><br>";
 	$shownameflag = 0;	// flag if this is <table>-headline 
 	echo "<table border='1'>";
 
@@ -209,9 +220,9 @@ if ($formid){
 		
 		// <table> heading line
 		if ($shownameflag==1){
-			echo "<tr><td bgcolor=#eeeeec><b>Time</b></td>";
+			echo "<tr><th class='time'>Time</th>";
 			while($myrow2 = sqlFetchArray($query2)){
-				echo "<td bgcolor=#d3d7cf><b>" . $myrow2['der_name'] . "</b></td>";		
+				echo "<th class='item'>" . $myrow2['der_name'] . "</th>";		
 			}
 			echo "</tr>";		
 		}
@@ -232,7 +243,12 @@ if ($formid){
 
 	}
 	echo "</tr></table>";
+	echo "<input type='hidden' name='formid' value='". $formid . "'>";
+	echo "<input type='submit' name='bn_save' value='save' />";
+?><input type='button' value='stop' onclick="top.restoreSession();location='<?php echo $GLOBALS['form_exit_url']; ?>'" /><?php
+	
 	echo "</form>";
 }//end if($formid)
+echo "</div>";
 formFooter();
 ?>
