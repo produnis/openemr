@@ -7,9 +7,30 @@
 	background-color:#d3d7cf; 
 }
   
+.ta_button{
+	font:10px Arial,Helvetica,sans-serif;
+	cursor: pointer;
+	color:#000000;
+	background-color:#d3d7cf; 
+}
+  
+.delete_button{
+	font:10px Arial,Helvetica,sans-serif;
+	cursor: pointer;
+	color:white;
+	background-color:red; 
+}
+ .nodelete_button{
+	font:10px Arial,Helvetica,sans-serif;
+	cursor: pointer;
+	color:black;
+	background-color:#d3d7cf; 
+}
+  
 
 #track_anything table{
 	border:1px solid black;
+	padding: 5px;
 }
 
 #track_anything td.menu{
@@ -61,4 +82,96 @@
 	background-color:#d3d7cf;
 	color:black;
 }
- 
+
+
+#ta_type p{
+margin-left:auto;
+margin-right:auto;
+} 
+
+
+#ta_type th{
+ background-color:#B8CCE4; 
+ padding:0pt;
+ font:15px Arial,Helvetica,sans-serif;	
+ color:black;
+ font-weight:bold;
+} 
+
+#ta_type td.parent{
+ padding:0pt;
+ background-color:#C6D9F0;
+ font:12px Arial,Helvetica,sans-serif;	
+ color:black;
+ font-weight:bold;
+} 
+
+#ta_type td.child{
+ padding:0pt;
+ background-color:#DEE5F1;
+ font:11px Arial,Helvetica,sans-serif;	
+ color:black;
+} 
+
+#ta_type td.op{
+ padding:0pt;
+ font:10px Arial,Helvetica,sans-serif;	
+ color:black;
+	background-color:#eeeeec;
+} 
+
+#ta_type th.add{
+ padding:0pt;
+ font:15px Arial,Helvetica,sans-serif;	
+ color:black;
+	background-color:#eeeeec;
+} 
+#ta_type td.add{
+ padding:0pt;
+ font:15px Arial,Helvetica,sans-serif;	
+ color:black;
+	background-color:#eeeeec;
+} 
+
+
+#ta_type th.edit{
+ padding:0pt;
+ font:15px Arial,Helvetica,sans-serif;	
+ color:black;
+	background-color:#eeeeec;
+} 
+#ta_type td.edit{
+ padding:0pt;
+ font:15px Arial,Helvetica,sans-serif;	
+ color:black;
+	background-color:#eeeeec;
+} 
+
+
+#ta_type .failure{
+ padding:0pt;
+ font:15px Arial,Helvetica,sans-serif;	
+ color:red;
+	background-color:#eeeeec;
+} 
+
+#ta_type table.create{
+	border:4px solid #B8CCE4; 
+	padding: 10px;
+}
+
+
+#ta_type table.add{
+	border:2px solid green;
+	padding: 5px;
+}
+
+#ta_type table.edit{
+	border:2px solid blue;
+	padding: 5px;
+}
+
+#ta_type table.del{
+	border:4px solid red;
+	padding: 5px;
+}

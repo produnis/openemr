@@ -1,6 +1,6 @@
 <?php
 /*******************************************************************************\
- * Copyright (C) Joe Slam (trackanything@produnis.de)                           *
+ * Copyright (C) 2014 Joe Slam (joe@produnis.de)                                *
  *                                                                              *
  * This program is free software; you can redistribute it and/or                *
  * modify it under the terms of the GNU General Public License                  *
@@ -13,9 +13,13 @@
  * GNU General Public License for more details.                                 *
  *                                                                              *
  * You should have received a copy of the GNU General Public License            *
- * along with this program; if not, write to the Free Software                  *
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.  *
- ********************************************************************************/
+ * along with this program; if not,                                             *
+ * see <http://opensource.org/licenses/gpl-license.php>                          *
+ ********************************************************************************
+ * @package OpenEMR
+ * @author Joe Slam <joe@produnis.de>
+ * @link http://www.open-emr.org
+ * */
 
 //SANITIZE ALL ESCAPES
 $sanitize_all_escapes=true;
@@ -32,7 +36,7 @@ require_once("../../globals.php");
 <br>
 <?php
 //retrieve most recent set of labdata.
-$spruch = "SELECT procedure_report.date_collected AS thedate, " . 
+$spell = "SELECT procedure_report.date_collected AS thedate, " . 
 			      "procedure_order_code.procedure_code AS theprocedure, " .
 				  "procedure_order.encounter_id AS theencounter " . 
 			"FROM procedure_report " . 
@@ -40,7 +44,7 @@ $spruch = "SELECT procedure_report.date_collected AS thedate, " .
 			"JOIN procedure_order_code ON procedure_order.procedure_order_id = procedure_order_code.procedure_order_id " . 
 			"WHERE procedure_order.patient_id = ? " . 
 			"ORDER BY procedure_report.date_collected DESC ";
-$result=sqlQuery($spruch, array($pid) );
+$result=sqlQuery($spell, array($pid) );
     
 if ( !$result ) //If there are no lab data recorded
 { ?>
@@ -56,8 +60,8 @@ if ( !$result ) //If there are no lab data recorded
   </b>
   <br />
   <?php 
-  	echo "Procedure: " . $result['theprocedure'] . " (" . $result['thedate'] . ")<br>";
-  	echo "Encounter: <a href='../../patient_file/encounter/encounter_top.php?set_encounter=" . $result['theencounter'] . "' target='RBot'>" . $result['theencounter'] . "</a>";
+  	echo xlt('Procedure') . ": " . text($result['theprocedure']) . " (" . text($result['thedate']) . ")<br>";
+  	echo xlt('Encounter') . ": <a href='../../patient_file/encounter/encounter_top.php?set_encounter=" . attr($result['theencounter']) . "' target='RBot'>" . text($result['theencounter']) . "</a>";
   ?>
   <br />
   </span><span class='text'>

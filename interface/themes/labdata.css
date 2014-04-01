@@ -1,4 +1,12 @@
+.graph {color:#0000cc;}
 
+.graph_button{
+	font:11px Arial,Helvetica,sans-serif;
+	cursor: pointer;
+	color:#000000;
+	background-color:#d3d7cf; 
+}
+  
 #labdata table{
 	border:1px solid black;
 }

@@ -17,6 +17,7 @@
 *
 * @package OpenEMR
 * @author Joe Slam <joe@produnis.de>
+* @link http://www.open-emr.org
 */
 
 // initial stuff
@@ -158,26 +159,26 @@ echo "<form method='post' action='history.php' onsubmit='return top.restoreSessi
 echo "<table><tr>";
 echo "<td class='menu'><input type='radio' name='ASC_DESC' ";
 if($ASC_DESC == 'ASC'){ echo "checked='checked' "; }
-echo " value='ASC'> ASC &nbsp;";
+echo " value='ASC'> " . xlt('ASC') . " &nbsp;";
 echo "<input type='radio' name='ASC_DESC' ";
 if($ASC_DESC != 'ASC'){ echo "checked='checked' ";}
-echo " value='DESC'> DESC";
+echo " value='DESC'> " . xlt('DESC');
 echo "</td>";
-echo "<td class='menu'><input class='graph_button' type='submit' name='submit' value='order tracks' /></td>";
-echo "<input type='hidden' name='formid' value='" . $formid . "'>";
-echo "<input type='hidden' name='fromencounter' value='" . $fromencounter . "'>";
+echo "<td class='menu'><input class='graph_button' type='submit' name='submit' value='" . xla('Order Tracks') . "' /></td>";
+echo "<input type='hidden' name='formid' value='" . attr($formid) . "'>";
+echo "<input type='hidden' name='fromencounter' value='" . attr($fromencounter) . "'>";
 //--------/end Choose output ASC/DESC
 
 // go to encounter or go to demographics
 //---------------------------------------------
 if($fromencounter == 1) {
-	echo "<td>&nbsp;&nbsp;&nbsp;<a class='css_button' href='".$GLOBALS['webroot'] . "/interface/patient_file/encounter/$returnurl' onclick='top.restoreSession()'><span>".xl('Back to encounter')."</span></a></td>";
+	echo "<td>&nbsp;&nbsp;&nbsp;<a class='css_button' href='".$GLOBALS['webroot'] . "/interface/patient_file/encounter/$returnurl' onclick='top.restoreSession()'><span>".xlt('Back to encounter')."</span></a></td>";
 	}
 if($fromencounter == 0) {
 	echo "<td>&nbsp;&nbsp;&nbsp;<a href='../../patient_file/summary/demographics.php' ";
     if (!$GLOBALS['concurrent_layout']){ echo "target='Main'"; }
     echo " class='css_button' onclick='top.restoreSession()'>";
-    echo "<span>" . htmlspecialchars(xl('Back to Patient'),ENT_NOQUOTES) . "</span></a></td>";
+    echo "<span>" . xlt('Back to Patient') . "</span></a></td>";
 	}
 //---------------------------------------------
 
@@ -187,25 +188,23 @@ echo "<hr>";
 
 
 // get name and id of selected track
-$spruch  = "SELECT form_track_anything.procedure_type_id AS die_id, procedure_type.name AS der_name ";
-$spruch .= "FROM form_track_anything "; 
-$spruch .= "INNER JOIN procedure_type ON form_track_anything.procedure_type_id = procedure_type.procedure_type_id ";
-$spruch .= "WHERE id = ?";
+$spell  = "SELECT form_track_anything.procedure_type_id AS the_id, form_track_anything_type.name AS the_name ";
+$spell .= "FROM form_track_anything "; 
+$spell .= "INNER JOIN form_track_anything_type ON form_track_anything.procedure_type_id = form_track_anything_type.track_anything_type_id ";
+$spell .= "WHERE id = ?";
 //---
-$query = sqlStatement($spruch, array($formid));
-while($myrow = sqlFetchArray($query)){
-	$the_procedure = $myrow["die_id"];
-	$the_procedure_name = $myrow["der_name"];
-}
+$myrow = sqlQuery($spell, array($formid));
+	$the_procedure = $myrow["the_id"];
+	$the_procedure_name = $myrow["the_name"];
 
 
 //echo "<div>";
 
 // print out track report
 //###########################
-echo "<h3>Track Report</h3>";
+echo "<h3>" . xlt('Track Report') . "</h3>";
 echo "<table id='track_anything' border=0>";
-echo "<tr><td>Track: </td><td>" . $the_procedure_name . " (procedure #" . $the_procedure . ")</td></tr>";
+echo "<tr><td> " . xlt('Track') . ": </td><td>" . text($the_procedure_name) . "</td></tr>";
 echo "</table>";
 echo "<hr>";
 
@@ -213,16 +212,16 @@ echo "<hr>";
 
 
 // get all track data, sort it by date $ASC_DESC, print it out grouped by encounter
-$spruch  = "SELECT form_track_anything.id, forms.encounter, form_track_anything_results.track_timestamp AS sortdate ";
-$spruch .= "FROM form_track_anything ";
-$spruch .= "JOIN forms ON form_track_anything.id = forms.form_id ";
-$spruch .= "JOIN form_track_anything_results ON form_track_anything.id = form_track_anything_results.track_anything_id ";
-$spruch .= "WHERE form_track_anything.procedure_type_id = ? ";
-$spruch .= "AND forms.form_name LIKE 'Track%' AND forms.pid = ? ";
-$spruch .= "GROUP BY id ";
-$spruch .= "ORDER BY sortdate " . $ASC_DESC;
+$spell  = "SELECT form_track_anything.id, forms.encounter, form_track_anything_results.track_timestamp AS sortdate ";
+$spell .= "FROM form_track_anything ";
+$spell .= "JOIN forms ON form_track_anything.id = forms.form_id ";
+$spell .= "JOIN form_track_anything_results ON form_track_anything.id = form_track_anything_results.track_anything_id ";
+$spell .= "WHERE form_track_anything.procedure_type_id = ? ";
+$spell .= "AND forms.form_name LIKE 'Track%' AND forms.pid = ? ";
+$spell .= "GROUP BY id ";
+$spell .= "ORDER BY sortdate " . escape_sort_order($ASC_DESC);
 //---
-$query = sqlStatement($spruch,array($the_procedure,$pid));
+$query = sqlStatement($spell,array($the_procedure,$pid));
 while($myrow = sqlFetchArray($query)){
 	$the_track = $myrow["id"];
 	$the_encounter = $myrow["encounter"];
@@ -240,38 +239,38 @@ while($myrow = sqlFetchArray($query)){
 	
 	
 	// get every single tracks
-	echo "<div id='graph" . $track_count . "'> </div><br>"; // here goes the graph
-	echo "<small>[Data from ";
-	echo "<a href='../../patient_file/encounter/encounter_top.php?set_encounter=" . $the_encounter . "' target='RBot'>encounter #" . $the_encounter . "</a>]";
+	echo "<div id='graph" . attr($track_count) . "'> </div><br>"; // here goes the graph
+	echo "<small>[" . xlt('Data from') . " ";
+	echo "<a href='../../patient_file/encounter/encounter_top.php?set_encounter=" . attr($the_encounter) . "' target='RBot'>" . xlt('encounter') . " #" . text($the_encounter) . "</a>]";
 	echo "</small>";
 	echo "<table border='1'>";
-	$spruch2  = "SELECT DISTINCT track_timestamp ";
-	$spruch2 .= "FROM form_track_anything_results ";
-	$spruch2 .= "WHERE track_anything_id = ? "; 
-	$spruch2 .= "ORDER BY track_timestamp " . $ASC_DESC;
-	$query2 = sqlStatement($spruch2, array($the_track));
+	$spell2  = "SELECT DISTINCT track_timestamp ";
+	$spell2 .= "FROM form_track_anything_results ";
+	$spell2 .= "WHERE track_anything_id = ? "; 
+	$spell2 .= "ORDER BY track_timestamp " . escape_sort_order($ASC_DESC);
+	$query2 = sqlStatement($spell2, array($the_track));
 	while($myrow2 = sqlFetchArray($query2)){ 
 		$thistime = $myrow2['track_timestamp'];
 		$shownameflag++;
 		
 		// get data of this specific track
-		$spruch3  = "SELECT form_track_anything_results.itemid, form_track_anything_results.result, procedure_type.name AS der_name ";
-		$spruch3 .= "FROM form_track_anything_results ";
-		$spruch3 .= "INNER JOIN procedure_type ON form_track_anything_results.itemid = procedure_type.procedure_type_id ";
-		$spruch3 .= "WHERE track_anything_id = ? AND track_timestamp = ? ";
-		$spruch3 .= "ORDER BY form_track_anything_results.track_timestamp " . $ASC_DESC . ", ";
-		$spruch3 .= "der_name ASC ";
-		$query3  = sqlStatement($spruch3, array($the_track, $thistime));
+		$spell3  = "SELECT form_track_anything_results.itemid, form_track_anything_results.result, form_track_anything_type.name AS the_name ";
+		$spell3 .= "FROM form_track_anything_results ";
+		$spell3 .= "INNER JOIN form_track_anything_type ON form_track_anything_results.itemid = form_track_anything_type.track_anything_type_id ";
+		$spell3 .= "WHERE track_anything_id = ? AND track_timestamp = ? ";
+		$spell3 .= "ORDER BY form_track_anything_results.track_timestamp " . escape_sort_order($ASC_DESC) . ", ";
+		$spell3 .= " form_track_anything_type.position ASC, the_name ASC ";
+		$query3  = sqlStatement($spell3, array($the_track, $thistime));
 		
 		// print local <table>-heads
 		// ----------------------------
 		if ($shownameflag==1){
-			echo "<tr><th class='time'>Time</th>";
+			echo "<tr><th class='time'>" . xlt('Time') . "</th>";
 			while($myrow3 = sqlFetchArray($query3)){
-				echo "<th class='item'>&nbsp;" . $myrow3['der_name'] . "&nbsp;</th>";	//  
+				echo "<th class='item'>&nbsp;" . text($myrow3['the_name']) . "&nbsp;</th>";	//  
 
 				if($save_item_flag == 0) {
-					$items_n[$items_c] = $myrow3['der_name']; // save item names
+					$items_n[$items_c] = $myrow3['the_name']; // save item names
 					$items_c++; // count number of items
 				}	
 				$col++;
@@ -282,14 +281,14 @@ while($myrow = sqlFetchArray($query)){
 		//-----/end print local table head
 		
 		// data-rows
-		echo "<tr><td class='time'>&nbsp;" . $thistime. "</td>";				
+		echo "<tr><td class='time'>&nbsp;" . text($thistime) . "</td>";				
 		$col_i = 0; // how many columns
 		$date_global[$row_gl] = $thistime; // save datetime into global array
 		$date_local[$row_lc]  = $thistime; // save datetime into local array
 
-		$query3  = sqlStatement($spruch3, array($the_track, $thistime));
+		$query3  = sqlStatement($spell3, array($the_track, $thistime));
 		while($myrow3 = sqlFetchArray($query3)){
-			echo "<td class='item'>&nbsp;" . $myrow3['result'] . "&nbsp;</td>";
+			echo "<td class='item'>&nbsp;" . text($myrow3['result']) . "&nbsp;</td>";
 			if (is_numeric($myrow3['result'])) {
 					$value_global[$col_i][$row_gl] = $myrow3['result']; // save value into global array 
 					$value_local[$col_i][$row_lc]  = $myrow3['result']; // save value into local array 
@@ -306,7 +305,7 @@ while($myrow = sqlFetchArray($query)){
 	// and show checkbox if so...
 	//----------------------------------------------------
 	echo "<tr>";
-	echo "<td class='check'>Check items to graph </td>"; // 
+	echo "<td class='check'>" . xlt('Check items to graph') . " </td>"; // 
 	for ($col_i = 0; $col_i < $col; $col_i++){
 		echo "<td class='check'>";
 		for ($row_b=0; $row_b <$row_lc; $row_b++) {
@@ -318,7 +317,7 @@ while($myrow = sqlFetchArray($query)){
 		
 		// show graph-checkbox only if we have more than 1 valid data
 		if ($localplot_c[$col_i] > 1 || $globalplot_c[$col_i] > 1){ 
-			echo "<input type='checkbox' name='check_col" . $track_count . "' value='" . $col_i . "'>";
+			echo "<input type='checkbox' name='check_col" . attr($track_count) . "' value='" . attr($col_i) . "'>";
 			if ($localplot_c[$col_i] > 1) {
 				$localplot++;
 			}
@@ -332,16 +331,16 @@ while($myrow = sqlFetchArray($query)){
 	echo "</tr></table>";
 	echo "<table>";
 	echo "<tr>";
-	echo "<td class='check'>With checked items plot:</td>"; // 
+	echo "<td class='check'>" . xlt('With checked items plot') . ":</td>"; // 
 	echo "<td class='check'>";
 	if ($localplot > 0){ 
-		echo "<input type='button' class='graph_button'  onclick='get_my_graph" . $track_count . "(\"local\")' name='' value='encounter data'>";
+		echo "<input type='button' class='graph_button'  onclick='get_my_graph" . attr($track_count) . "(\"local\")' name='' value='" . xla('encounter data') . "'>";
 	}
 	if ($localplot > 0 && $globalplot > 0){
 			echo "<br>";
 	}
 	if ($globalplot > 0){ 
-		echo "<input type='button' class='graph_button'  onclick='get_my_graph" . $track_count . "(\"global\")' name='' value='data of all encounters so far'>";
+		echo "<input type='button' class='graph_button'  onclick='get_my_graph" . attr($track_count) . "(\"global\")' name='' value='" . xla('data of all encounters so far') . "'>";
 	}
 	echo "</td>";
 	echo "</tr>";
@@ -353,7 +352,7 @@ while($myrow = sqlFetchArray($query)){
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ?>
 <script type="text/javascript">	
-function get_my_graph<?php echo $track_count; ?>(where){
+function get_my_graph<?php echo attr($track_count); ?>(where){
 	top.restoreSession();
 	if(where=="local"){
 		//alert("local");
@@ -366,10 +365,10 @@ function get_my_graph<?php echo $track_count; ?>(where){
 		var thevalues =  JSON.stringify(<?php echo json_encode($value_global); ?>);
 	}
 
-	var checkedBoxes = JSON.stringify(getCheckedBoxes("check_col<?php echo $track_count ?>"));
+	var checkedBoxes = JSON.stringify(getCheckedBoxes("check_col<?php echo attr($track_count) ?>"));
 	var theitems = JSON.stringify(<?php echo json_encode($items_n); ?>);
 	var thetrack = JSON.stringify(<?php echo json_encode($the_procedure_name); ?>);
-	plot_graph(checkedBoxes, theitems, thetrack, thedates, thevalues, <?php echo $track_count; ?>);
+	plot_graph(checkedBoxes, theitems, thetrack, thedates, thevalues, <?php echo attr($track_count); ?>);
 }
 </script>
 <?php
@@ -380,7 +379,7 @@ function get_my_graph<?php echo $track_count; ?>(where){
 
 //######################################################### 
 // This is the End
-echo "<p>End of report.</p>";
+echo "<p>" . xlt('End of report') . ".</p>";
 
 echo "<hr>";
 
@@ -390,21 +389,21 @@ echo "<form method='post' action='history.php' onsubmit='return top.restoreSessi
 echo "<table><tr>";
 echo "<td class='menu'><input type='radio' name='ASC_DESC' ";
 if($ASC_DESC == 'ASC'){ echo "checked='checked' "; }
-echo " value='ASC'> ASC &nbsp;";
+echo " value='ASC'> " . xlt('ASC') . " &nbsp;";
 echo "<input type='radio' name='ASC_DESC' ";
 if($ASC_DESC != 'ASC'){ echo "checked='checked' ";}
-echo " value='DESC'> DESC";
+echo " value='DESC'> " . xlt('DESC');
 echo "</td>";
-echo "<td class='menu'><input class='graph_button' type='submit' name='submit' value='order tracks' /></td>";
-echo "<input type='hidden' name='formid' value='" . $formid . "'>";
-echo "<input type='hidden' name='fromencounter' value='" . $fromencounter . "'>";
+echo "<td class='menu'><input class='graph_button' type='submit' name='submit' value='" . xlt('Order Tracks') . "' /></td>";
+echo "<input type='hidden' name='formid' value='" . attr($formid) . "'>";
+echo "<input type='hidden' name='fromencounter' value='" . attr($fromencounter) . "'>";
 //--------/end Choose output ASC/DESC
 
 
 // go to encounter or go to demographics
 //---------------------------------------------
 if($fromencounter == 1) {
-	echo "<td>&nbsp;&nbsp;&nbsp;<a class='css_button' href='".$GLOBALS['webroot'] . "/interface/patient_file/encounter/$returnurl' onclick='top.restoreSession()'><span>".xl('Back to encounter')."</span></a></td>";
+	echo "<td>&nbsp;&nbsp;&nbsp;<a class='css_button' href='".$GLOBALS['webroot'] . "/interface/patient_file/encounter/$returnurl' onclick='top.restoreSession()'><span>".xlt('Back to encounter')."</span></a></td>";
 	}
 if($fromencounter == 0) {
 	echo "<td>&nbsp;&nbsp;&nbsp;<a href='../../patient_file/summary/demographics.php' ";

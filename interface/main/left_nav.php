@@ -135,6 +135,7 @@ use ESign\Api;
   'doc' => array(xl('Documents') , 1, '../controller.php?document&list&patient_id={PID}'),
   'orp' => array(xl('Proc Pending Rev'), 1, 'orders/orders_results.php?review=1'),
   'orr' => array(xl('Proc Res')  , 1, 'orders/orders_results.php'),
+  'lab' => array(xl('Lab overview')  , 1, 'patient_file/summary/labdata.php'),
   'prp' => array(xl('Pt Report') , 1, 'patient_file/report/patient_report.php'),
   'prq' => array(xl('Pt Rec Request') , 1, 'patient_file/transaction/record_request.php'),
   'pno' => array(xl('Pt Notes')  , 1, 'patient_file/summary/pnotes.php'),
@@ -1274,6 +1275,7 @@ if (!empty($reg)) {
       <?php genTreeLink('RTop','orc',xl('Load Compendium')); ?>
       <?php genTreeLink('RTop','orp',xl('Pending Review')); ?>
       <?php genTreeLink('RTop','orr',xl('Patient Results')); ?>
+      <?php genTreeLink('RTop','lab',xl('Lab Overview')); ?>
       <?php genTreeLink('RTop','orb',xl('Batch Results')); ?>
       <?php genTreeLink('RTop','ore',xl('Electronic Reports')); ?>
     </ul>

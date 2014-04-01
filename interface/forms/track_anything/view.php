@@ -17,6 +17,7 @@
 *
 * @package OpenEMR
 * @author Joe Slam <trackanything@produnis.de>
+* @link http://www.open-emr.org
 */
 
 require_once("new.php");

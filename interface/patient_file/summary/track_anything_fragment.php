@@ -1,6 +1,6 @@
 <?php
 /*******************************************************************************\
- * Copyright (C) Joe Slam (trackanything@produnis.de)                           *
+ * Copyright (C) 2014 Joe Slam (joe@produnis.de)                                *
  *                                                                              *
  * This program is free software; you can redistribute it and/or                *
  * modify it under the terms of the GNU General Public License                  *
@@ -13,9 +13,14 @@
  * GNU General Public License for more details.                                 *
  *                                                                              *
  * You should have received a copy of the GNU General Public License            *
- * along with this program; if not, write to the Free Software                  *
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.  *
- ********************************************************************************/
+ * along with this program; if not,                                             *
+ * see <http://opensource.org/licenses/gpl-license.php>                         *
+ ********************************************************************************
+ * @package OpenEMR
+ * @author Joe Slam <joe@produnis.de>
+ * @link http://www.open-emr.org
+ * 
+ */
 
 //SANITIZE ALL ESCAPES
 $sanitize_all_escapes=true;
@@ -32,7 +37,7 @@ require_once("../../globals.php");
 <br>
 <?php
 //retrieve tracks.
-$spruch = "SELECT form_name, MAX(form_track_anything_results.track_timestamp) as maxdate, form_id " .
+$spell = "SELECT form_name, MAX(form_track_anything_results.track_timestamp) as maxdate, form_id " .
 			"FROM forms " . 
 			"JOIN form_track_anything_results ON forms.form_id = form_track_anything_results.track_anything_id " . 
 			"WHERE forms.pid = ? " . 
@@ -40,7 +45,7 @@ $spruch = "SELECT form_name, MAX(form_track_anything_results.track_timestamp) as
 			"GROUP BY form_name " .
 			"ORDER BY maxdate DESC " . 
 			"";
-$result=sqlStatement($spruch, array($pid, "Track%") );
+$result=sqlStatement($spell, array($pid, "Track%") );
 if ( !$result ) //If there are no disclosures recorded
 { ?>
   <span class='text'> <?php echo htmlspecialchars(xl("No tracks have been documented."),ENT_NOQUOTES); 
@@ -49,16 +54,14 @@ if ( !$result ) //If there are no disclosures recorded
 <?php 
 } else {  // We have some tracks here...
 	echo "<span class='text'>";
-	#echo "PID is " . $result;
-	echo "Available Tracks:";
+	echo xlt('Available Tracks') . ":";
 	echo "<ul>";
-	$result=sqlStatement($spruch, array($pid, "Track%") );
+	$result=sqlStatement($spell, array($pid, "Track%") );
 	while($myrow = sqlFetchArray($result)){
 		$formname = $myrow['form_name'];
 		$thedate = $myrow['maxdate'];
-		#$thedate = explode(" ", $thedate);
 		$formid = $myrow['form_id'];
-		echo "<li><a href='../../forms/track_anything/history.php?formid=" . $formid . "'>" . $formname . "</a></li> (" . $thedate . ")</li>";
+		echo "<li><a href='../../forms/track_anything/history.php?formid=" . attr($formid) . "'>" . text($formname) . "</a></li> (" . text($thedate) . ")</li>";
 	}
 	echo "</ul>";
 	echo "</span>";

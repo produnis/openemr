@@ -17,10 +17,9 @@
 *
 * @package OpenEMR
 * @author Joe Slam <trackanything@produnis.de>
+* @link http://www.open-emr.org
 */
-$sanitize_all_escapes  = true;
-$fake_register_globals = false;
-require_once("../../globals.php");
+
 include_once($GLOBALS["srcdir"] . "/api.inc");
 
 echo "<html><head>";
@@ -66,7 +65,7 @@ function open_flash_chart_data(){
 echo "</head><body class='body_top'>";
 
 function track_anything_report( $pid, $encounter, $cols, $id){
-	require_once("../../globals.php");
+	$patient_report_flag = 'no';
 	echo "<div id='track_anything'>";
 	global $web_root;
 	$ofc_name = array();
@@ -77,55 +76,55 @@ function track_anything_report( $pid, $encounter, $cols, $id){
 	$dummy = array(); // counter to decide if graph-button is shown
 	$formid = $id;
 	$shownameflag = 0;	
-	echo "<div id='graph" . $formid . "'> </div><br>";
+	echo "<div id='graph" . attr($formid) . "'> </div><br>";
 	echo "<table border='1'>";
 
 	// get name of selected track, used for GraphTitle
-	$spruch  = "SELECT procedure_type.name AS track_name ";
-	$spruch .= "FROM form_track_anything "; 
-	$spruch .= "INNER JOIN procedure_type ON form_track_anything.procedure_type_id = procedure_type.procedure_type_id ";
-	$spruch .= "WHERE id = ?";
-	$query = sqlStatement($spruch, array($formid));
+	$spell  = "SELECT form_track_anything_type.name AS track_name ";
+	$spell .= "FROM form_track_anything "; 
+	$spell .= "INNER JOIN form_track_anything_type ON form_track_anything.procedure_type_id = form_track_anything_type.track_anything_type_id ";
+	$spell .= "WHERE id = ?";
+	$query = sqlStatement($spell, array($formid));
 	$myrow = sqlFetchArray($query);
 	$the_track_name = $myrow["track_name"];
 	//------------
 
 	// get correct track
-	$pruch  = "SELECT DISTINCT track_timestamp ";
-	$pruch .= "FROM form_track_anything_results ";
-	$pruch .= "WHERE track_anything_id = ? ";
-	$pruch .= "ORDER BY track_timestamp DESC ";
-	$query = sqlStatement($pruch, array($formid));
+	$spell0  = "SELECT DISTINCT track_timestamp ";
+	$spell0 .= "FROM form_track_anything_results ";
+	$spell0 .= "WHERE track_anything_id = ? ";
+	$spell0 .= "ORDER BY track_timestamp DESC ";
+	$query = sqlStatement($spell0, array($formid));
 	
 	// get all data of this specific track
 	while($myrow = sqlFetchArray($query)){ 
 		$thistime = $myrow['track_timestamp'];
 		$shownameflag++;		
-		$spruch  = "SELECT form_track_anything_results.itemid, form_track_anything_results.result, procedure_type.name AS der_name ";
-		$spruch .= "FROM form_track_anything_results ";
-		$spruch .= "INNER JOIN procedure_type ON form_track_anything_results.itemid = procedure_type.procedure_type_id ";
-		$spruch .= "WHERE track_anything_id = ? AND track_timestamp = ? ";
-		$spruch .= "ORDER BY der_name ASC ";
-		$query2  = sqlStatement($spruch, array($formid, $thistime));
+		$spell  = "SELECT form_track_anything_results.itemid, form_track_anything_results.result, form_track_anything_type.name AS the_name ";
+		$spell .= "FROM form_track_anything_results ";
+		$spell .= "INNER JOIN form_track_anything_type ON form_track_anything_results.itemid = form_track_anything_type.track_anything_type_id ";
+		$spell .= "WHERE track_anything_id = ? AND track_timestamp = ? ";
+		$spell .= "ORDER BY form_track_anything_type.position ASC, the_name ASC ";
+		$query2  = sqlStatement($spell, array($formid, $thistime));
 		
 		// is this the <tbale>-head?
 		if ($shownameflag==1){
-			echo "<tr><th class='time'>Time</td>";
+			echo "<tr><th class='time'>" . xlt('Time') . "</td>";
 			while($myrow2 = sqlFetchArray($query2)){
-				echo "<th class='item'>&nbsp;" . $myrow2['der_name'] . "&nbsp;</td>";		
-				$ofc_name[$col] = $myrow2['der_name']; // save for openflashchart-form
+				echo "<th class='item'>&nbsp;" . text($myrow2['the_name']) . "&nbsp;</td>";		
+				$ofc_name[$col] = $myrow2['the_name']; // save for openflashchart-form
 				$col++;
 			}
 			echo "</tr>";		
 		}
 		
 		// post data entries per row
-		echo "<tr><td class='time'>" . $thistime. "</td>";	
+		echo "<tr><td class='time'>" . text($thistime) . "</td>";	
 		$ofc_date[$row] = $thistime; // save for openflashchart-form			
 		$col_i = 0; // how many columns
-		$query2  = sqlStatement($spruch, array($formid, $thistime));
+		$query2  = sqlStatement($spell, array($formid, $thistime));
 		while($myrow2 = sqlFetchArray($query2)){
-			echo "<td class='item'>&nbsp;" . $myrow2['result'] . "&nbsp;</td>";
+			echo "<td class='item'>&nbsp;" . text($myrow2['result']) . "&nbsp;</td>";
 			if (is_numeric($myrow2['result'])) {
 					$ofc_value[$col_i][$row] = $myrow2['result'];// save for openflashchart-form
 			}
@@ -134,42 +133,52 @@ function track_anything_report( $pid, $encounter, $cols, $id){
 		echo "</tr>";
 		$row++;
 	}
+	
 
+
+	// hide all interactive link stuff if inside a patient report
+	// (to keep Patient Report clean...)	
+	//--------------------------------------------------------------
+	if ($patient_report_flag == 'no'){
 	// Graph-Button row
-	echo "<tr>";
-	echo "<td class='check'>Check items to graph</td>"; 
-	for ($col_i = 0; $col_i < $col; $col_i++){
-		echo "<td class='check'>";
-		for ($row_b=0; $row_b <$row; $row_b++) {
-			// count more than 1 to show graph-button
-			if(is_numeric($ofc_value[$col_i][$row_b])){ $dummy[$col_i]++; 
+	//-------------------------------		
+		echo "<tr>";
+		echo "<td class='check'>" . xlt('Check items to graph') . "</td>"; 
+		for ($col_i = 0; $col_i < $col; $col_i++){
+			echo "<td class='check'>";
+			for ($row_b=0; $row_b <$row; $row_b++) {
+				// count more than 1 to show graph-button
+				if(is_numeric($ofc_value[$col_i][$row_b])){ $dummy[$col_i]++; 
+				}
 			}
+			// show graph-button only if we have more than 1 valid data
+			if ($dummy[$col_i] > 1){ 
+				echo "<input type='checkbox' name='check_col" . attr($formid) . "' value='" . attr($col_i) . "'>";
+				$showbutton++;
+			}
+			echo "</td>";
 		}
-		// show graph-button only if we have more than 1 valid data
-		if ($dummy[$col_i] > 1){ 
-			echo "<input type='checkbox' name='check_col" . $formid . "' value='" . $col_i . "'>";
-			$showbutton++;
-		}
-		echo "</td>";
-	}
-	echo "</tr>";
-
-	if($showbutton>0){
-		echo "<tr><td></td>";
-		echo "<td colspan='" . $col . "'>";
-		echo "<input type='button' class='graph_button' ";
-		echo " onclick='plot_graph" . $formid ."()' ";
-		echo "name='' value='Plot selected Items'>";
-		echo "</td></tr>";
+		echo "</tr>";
+	
+	// end Graph-Button-Row---------
+	
+		if($showbutton>0){
+			echo "<tr><td></td>";
+			echo "<td colspan='" . attr($col) . "'>";
+			echo "<input type='button' class='graph_button' ";
+			echo " onclick='plot_graph" . attr($formid) ."()' ";
+			echo "name='' value='" . xla('Plot selected Items') . "'>";
+			echo "</td></tr>";
 		}
 	//---/end graph button------------------
-	echo "</table>";	
-	echo "<br>";
+		echo "</table>";	
+		echo "<br>";
 
-	echo "<form method='post' action='../../forms/track_anything/history.php' onsubmit='return top.restoreSession()'>"; 
-	echo "<input type='hidden' name='formid' value='". $formid . "'>";
-	echo "<input type='submit' name='history' value='Show track history' />";
-	echo "</form>";
+		echo "<form method='post' action='../../forms/track_anything/history.php' onsubmit='return top.restoreSession()'>"; 
+		echo "<input type='hidden' name='formid' value='". attr($formid) . "'>";
+		echo "<input type='submit' name='history' value='" . xla('Show track history') . "' />";
+		echo "</form>";
+	} // end if encounter
 ?>
 <script>
 // plot the current graph

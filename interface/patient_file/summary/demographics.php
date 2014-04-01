@@ -956,43 +956,12 @@ expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel,
      </td>
     </tr>		
 
-<?php if ($vitals_is_registered && acl_check('patients', 'med')) { ?>
-    <tr>
-     <td width='650px'>
-<?php // vitals expand collapse widget
-  $widgetTitle = xl("Vitals");
-  $widgetLabel = "vitals";
-  $widgetButtonLabel = xl("Trend");
-  $widgetButtonLink = "../encounter/trend_form.php?formname=vitals";
-  $widgetButtonClass = "";
-  $linkMethod = "html";
-  $bodyClass = "notab";
-  // check to see if any vitals exist
-  $existVitals = sqlQuery("SELECT * FROM form_vitals WHERE pid=?", array($pid) );
-  if ($existVitals) {
-    $widgetAuth = true;
-  }
-  else {
-    $widgetAuth = false;
-  }
-  $fixedWidth = true;
-  expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel,
-    $widgetButtonLink, $widgetButtonClass, $linkMethod, $bodyClass,
-    $widgetAuth, $fixedWidth);
-?>
-      <br/>
-      <div style='margin-left:10px' class='text'><img src='../../pic/ajax-loader.gif'/></div><br/>
-      </div>
-     </td>
-    </tr>
-<?php } // end if ($vitals_is_registered && acl_check('patients', 'med')) ?>
-
 
  <?php // labdata ?>
     <tr>
      <td width='650px'>
 <?php // labdata expand collapse widget
-  $widgetTitle = xl("LabData");
+  $widgetTitle = xl("Labs");
   $widgetLabel = "labdata";
   $widgetButtonLabel = xl("Trend");
   $widgetButtonLink = "../summary/labdata.php";#"../encounter/trend_form.php?formname=labdata";
@@ -1023,6 +992,40 @@ expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel,
      </td>
     </tr>
 <?php  // end labdata ?>
+
+
+
+
+<?php if ($vitals_is_registered && acl_check('patients', 'med')) { ?>
+    <tr>
+     <td width='650px'>
+<?php // vitals expand collapse widget
+  $widgetTitle = xl("Vitals");
+  $widgetLabel = "vitals";
+  $widgetButtonLabel = xl("Trend");
+  $widgetButtonLink = "../encounter/trend_form.php?formname=vitals";
+  $widgetButtonClass = "";
+  $linkMethod = "html";
+  $bodyClass = "notab";
+  // check to see if any vitals exist
+  $existVitals = sqlQuery("SELECT * FROM form_vitals WHERE pid=?", array($pid) );
+  if ($existVitals) {
+    $widgetAuth = true;
+  }
+  else {
+    $widgetAuth = false;
+  }
+  $fixedWidth = true;
+  expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel,
+    $widgetButtonLink, $widgetButtonClass, $linkMethod, $bodyClass,
+    $widgetAuth, $fixedWidth);
+?>
+      <br/>
+      <div style='margin-left:10px' class='text'><img src='../../pic/ajax-loader.gif'/></div><br/>
+      </div>
+     </td>
+    </tr>
+<?php } // end if ($vitals_is_registered && acl_check('patients', 'med')) ?>
 
 <?php
   // This generates a section similar to Vitals for each LBF form that
@@ -1387,9 +1390,9 @@ expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel,
 			$widgetTitle = xl("Tracks");
 			$widgetLabel = "track_anything";
 			$widgetButtonLabel = xl("Tracks");
-			#$widgetButtonLink = "";#"../encounter/trend_form.php?formname=labdata";
-			#$widgetButtonClass = "";
-			$linkMethod = "javascript";
+			$widgetButtonLink = "../../forms/track_anything/create.php";#"../encounter/trend_form.php?formname=labdata";
+			$widgetButtonClass = "";
+			$linkMethod = "html";
 			$bodyClass = "notab";
 			// check to see if any tracks exist
 			$spruch = "SELECT id " .
