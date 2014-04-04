@@ -65,7 +65,7 @@ function open_flash_chart_data(){
 echo "</head><body class='body_top'>";
 
 function track_anything_report( $pid, $encounter, $cols, $id){
-	$patient_report_flag = 'no';
+	#$patient_report_flag = 'no';
 	echo "<div id='track_anything'>";
 	global $web_root;
 	$ofc_name = array();
@@ -138,14 +138,14 @@ function track_anything_report( $pid, $encounter, $cols, $id){
 
 	// hide all interactive link stuff if inside a patient report
 	// (to keep Patient Report clean...)	
+	// Thus we use "<div class='navigateLink'>"; see custom_report.php
 	//--------------------------------------------------------------
-	if ($patient_report_flag == 'no'){
 	// Graph-Button row
 	//-------------------------------		
 		echo "<tr>";
-		echo "<td class='check'>" . xlt('Check items to graph') . "</td>"; 
+		echo "<td class='check'><div class='navigateLink'>" . xlt('Check items to graph') . "</div></td>"; 
 		for ($col_i = 0; $col_i < $col; $col_i++){
-			echo "<td class='check'>";
+			echo "<td class='check'><div class='navigateLink'>";
 			for ($row_b=0; $row_b <$row; $row_b++) {
 				// count more than 1 to show graph-button
 				if(is_numeric($ofc_value[$col_i][$row_b])){ $dummy[$col_i]++; 
@@ -156,7 +156,7 @@ function track_anything_report( $pid, $encounter, $cols, $id){
 				echo "<input type='checkbox' name='check_col" . attr($formid) . "' value='" . attr($col_i) . "'>";
 				$showbutton++;
 			}
-			echo "</td>";
+			echo "</div></td>";
 		}
 		echo "</tr>";
 	
@@ -164,21 +164,21 @@ function track_anything_report( $pid, $encounter, $cols, $id){
 	
 		if($showbutton>0){
 			echo "<tr><td></td>";
-			echo "<td colspan='" . attr($col) . "'>";
+			echo "<td colspan='" . attr($col) . "'><div class='navigateLink'>";
 			echo "<input type='button' class='graph_button' ";
 			echo " onclick='plot_graph" . attr($formid) ."()' ";
 			echo "name='' value='" . xla('Plot selected Items') . "'>";
-			echo "</td></tr>";
+			echo "</div></td></tr>";
 		}
 	//---/end graph button------------------
 		echo "</table>";	
 		echo "<br>";
-
+	echo "<div class='navigateLink'>"; // see custom_report.php
 		echo "<form method='post' action='../../forms/track_anything/history.php' onsubmit='return top.restoreSession()'>"; 
 		echo "<input type='hidden' name='formid' value='". attr($formid) . "'>";
 		echo "<input type='submit' name='history' value='" . xla('Show track history') . "' />";
 		echo "</form>";
-	} // end if encounter
+	echo "</div>"; // end hide for report
 ?>
 <script>
 // plot the current graph

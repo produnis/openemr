@@ -83,7 +83,7 @@ if (!$formid){
 		echo "<form method='post' action='" . $rootdir . "/forms/track_anything/new.php' onsubmit='return top.restoreSession()'>"; 
 
 		echo "<select name='procedure2track' size='10' style='width: 300px'>";
-		$testi = sqlStatement("SELECT * FROM form_track_anything_type WHERE parent = 0 ORDER BY name ASC ");
+		$testi = sqlStatement("SELECT * FROM form_track_anything_type WHERE parent = 0 ORDER BY position ASC, name ASC ");
 		while($myrow = sqlFetchArray($testi)){ 
 			$myprocedureid = $myrow["track_anything_type_id"];
 			$myprocedurename = $myrow["name"];
