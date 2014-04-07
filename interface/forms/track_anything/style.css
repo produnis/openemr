@@ -138,7 +138,7 @@ margin-right:auto;
  padding:0pt;
  font:15px Arial,Helvetica,sans-serif;	
  color:black;
-	background-color:#eeeeec;
+ background-color:#eeeeec;
 } 
 #ta_type td.edit{
  padding:0pt;
@@ -146,6 +146,27 @@ margin-right:auto;
  color:black;
 	background-color:#eeeeec;
 } 
+
+
+
+#ta_type th.deactive{
+ font:10px Arial,Helvetica,sans-serif;	
+ color:black;
+ font-style:italic;
+ background-color: #a5a5a5;
+	
+}
+
+
+#ta_type td.deactive{
+ font:10px Arial,Helvetica,sans-serif;	
+ color:black;
+ font-style:italic;
+ background-color:#bfbfbf;
+	
+}
+
+
 
 
 #ta_type .failure{

@@ -29,7 +29,6 @@ echo "<html><head>";
 ?> 
 <link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css">
 <link rel="stylesheet" href="<?php echo $web_root; ?>/interface/forms/track_anything/style.css" type="text/css"> 
-<script type="text/javascript" src="<?php echo $web_root; ?>/library/js/jquery.1.3.2.js"></script>
 <script type="text/javascript" src="<?php echo $web_root; ?>/library/openflashchart/js/json/json2.js"></script>
 <script type="text/javascript" src="<?php echo $web_root; ?>/library/openflashchart/js/swfobject.js"></script>
 <script type="text/javascript">
@@ -83,9 +82,8 @@ function track_anything_report( $pid, $encounter, $cols, $id){
 	$spell  = "SELECT form_track_anything_type.name AS track_name ";
 	$spell .= "FROM form_track_anything "; 
 	$spell .= "INNER JOIN form_track_anything_type ON form_track_anything.procedure_type_id = form_track_anything_type.track_anything_type_id ";
-	$spell .= "WHERE id = ?";
-	$query = sqlStatement($spell, array($formid));
-	$myrow = sqlFetchArray($query);
+	$spell .= "WHERE id = ? AND form_track_anything_type.active = 1";
+	$myrow = sqlQuery($spell, array($formid));
 	$the_track_name = $myrow["track_name"];
 	//------------
 
@@ -103,7 +101,7 @@ function track_anything_report( $pid, $encounter, $cols, $id){
 		$spell  = "SELECT form_track_anything_results.itemid, form_track_anything_results.result, form_track_anything_type.name AS the_name ";
 		$spell .= "FROM form_track_anything_results ";
 		$spell .= "INNER JOIN form_track_anything_type ON form_track_anything_results.itemid = form_track_anything_type.track_anything_type_id ";
-		$spell .= "WHERE track_anything_id = ? AND track_timestamp = ? ";
+		$spell .= "WHERE track_anything_id = ? AND track_timestamp = ? AND form_track_anything_type.active = 1 ";
 		$spell .= "ORDER BY form_track_anything_type.position ASC, the_name ASC ";
 		$query2  = sqlStatement($spell, array($formid, $thistime));
 		

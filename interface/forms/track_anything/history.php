@@ -191,7 +191,7 @@ echo "<hr>";
 $spell  = "SELECT form_track_anything.procedure_type_id AS the_id, form_track_anything_type.name AS the_name ";
 $spell .= "FROM form_track_anything "; 
 $spell .= "INNER JOIN form_track_anything_type ON form_track_anything.procedure_type_id = form_track_anything_type.track_anything_type_id ";
-$spell .= "WHERE id = ?";
+$spell .= "WHERE id = ? AND form_track_anything_type.active = 1";
 //---
 $myrow = sqlQuery($spell, array($formid));
 	$the_procedure = $myrow["the_id"];
@@ -216,8 +216,8 @@ $spell  = "SELECT form_track_anything.id, forms.encounter, form_track_anything_r
 $spell .= "FROM form_track_anything ";
 $spell .= "JOIN forms ON form_track_anything.id = forms.form_id ";
 $spell .= "JOIN form_track_anything_results ON form_track_anything.id = form_track_anything_results.track_anything_id ";
-$spell .= "WHERE form_track_anything.procedure_type_id = ? ";
-$spell .= "AND forms.form_name LIKE 'Track%' AND forms.pid = ? ";
+$spell .= "WHERE form_track_anything.procedure_type_id = ?  ";
+$spell .= "AND forms.formdir = 'track_anything' AND forms.pid = ? ";
 $spell .= "GROUP BY id ";
 $spell .= "ORDER BY sortdate " . escape_sort_order($ASC_DESC);
 //---
@@ -257,7 +257,7 @@ while($myrow = sqlFetchArray($query)){
 		$spell3  = "SELECT form_track_anything_results.itemid, form_track_anything_results.result, form_track_anything_type.name AS the_name ";
 		$spell3 .= "FROM form_track_anything_results ";
 		$spell3 .= "INNER JOIN form_track_anything_type ON form_track_anything_results.itemid = form_track_anything_type.track_anything_type_id ";
-		$spell3 .= "WHERE track_anything_id = ? AND track_timestamp = ? ";
+		$spell3 .= "WHERE track_anything_id = ? AND track_timestamp = ? AND form_track_anything_type.active = 1 ";
 		$spell3 .= "ORDER BY form_track_anything_results.track_timestamp " . escape_sort_order($ASC_DESC) . ", ";
 		$spell3 .= " form_track_anything_type.position ASC, the_name ASC ";
 		$query3  = sqlStatement($spell3, array($the_track, $thistime));

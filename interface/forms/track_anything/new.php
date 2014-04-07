@@ -63,8 +63,8 @@ if (!$formid){
 			$query = "INSERT INTO form_track_anything (procedure_type_id) VALUES (?)";
 			$formid = sqlInsert($query, $myprocedureid);
 			$spell = "SELECT name FROM form_track_anything_type WHERE track_anything_type_id = ?";
-			$query = sqlStatement($spell,array($myprocedureid));
-			while($myrow = sqlFetchArray($query)){$myprocedurename = $myrow["name"]; }
+			$myrow = sqlQuery($spell,array($myprocedureid));
+			$myprocedurename = $myrow["name"]; 
 			$register_as = "Track: " . $myprocedurename;
 			// adding Form
 			addForm($encounter, $register_as, $formid, "track_anything", $pid, $userauthorized);
@@ -83,7 +83,10 @@ if (!$formid){
 		echo "<form method='post' action='" . $rootdir . "/forms/track_anything/new.php' onsubmit='return top.restoreSession()'>"; 
 
 		echo "<select name='procedure2track' size='10' style='width: 300px'>";
-		$testi = sqlStatement("SELECT * FROM form_track_anything_type WHERE parent = 0 ORDER BY position ASC, name ASC ");
+		$spell  = "SELECT * FROM form_track_anything_type ";
+		$spell .= "WHERE parent = 0 AND active = 1 ";
+		$spell .= "ORDER BY position ASC, name ASC ";
+		$testi = sqlStatement($spell);
 		while($myrow = sqlFetchArray($testi)){ 
 			$myprocedureid = $myrow["track_anything_type_id"];
 			$myprocedurename = $myrow["name"];
@@ -155,21 +158,14 @@ if ($formid){
 	$how_many = count($old_time);
 	// do this for each data row	
 	for ($x=0; $x<=$how_many; $x++) {  			
-		#echo "Date: ". $old_time[$x] . "<br>"; // DEBUGG
 		// how many columns do we have
 		$how_many_cols = count($old_value[$x]);
 		for($y=0; $y<$how_many_cols; $y++){
-			#echo "----ID: ". $old_id[$x][$y] . "<br>"; //DEBUG
-			#echo "----value: " . $old_value[$x][$y] . "<br><br>"; //DEBUG
-			
-			#if($old_value[$x][$y] != NULL) { // commented out, so user can NULL entries
 				// here goes the UPDATE sql-spruch
 				$insertspell  = "UPDATE form_track_anything_results ";
 				$insertspell .= "SET track_timestamp = ? , result = ? ";
 				$insertspell .= "WHERE id = ? ";
-				#$insertspell .= " ";
-				sqlInsert($insertspell, array($old_time[$x], $old_value[$x][$y], $old_id[$x][$y]));
-			#}
+				sqlStatement($insertspell, array($old_time[$x], $old_value[$x][$y], $old_id[$x][$y]));
 		}
 		
 	}
@@ -179,10 +175,9 @@ if ($formid){
 	//get procedure ID
 	if (!$myprocedureid){
 		$spell = "SELECT procedure_type_id FROM form_track_anything WHERE id = ?";
-		$testi = sqlStatement($spell, array($formid));
-		while($myrow = sqlFetchArray($testi)){ 
-			$myprocedureid = $myrow["procedure_type_id"];
-		}
+		$myrow = sqlQuery($spell, array($formid));
+		$myprocedureid = $myrow["procedure_type_id"];
+		
 	}
 	echo "<br><b>" . xlt('Enter new data') . "</b>:<br>";
 	echo "<form method='post' action='" . $rootdir . "/forms/track_anything/new.php' onsubmit='return top.restoreSession()'>"; 
@@ -194,7 +189,7 @@ if ($formid){
 	
 	// get items to track
 	$liste = array();
-	$spell = "SELECT * FROM form_track_anything_type WHERE parent = ? ORDER BY position ASC, name ASC ";
+	$spell = "SELECT * FROM form_track_anything_type WHERE parent = ? AND active = 1 ORDER BY position ASC, name ASC ";
 	$query = sqlStatement($spell, array($myprocedureid));
 	while($myrow = sqlFetchArray($query)){ 	
 		echo "<input type='hidden' name='liste[]' value='". attr($myrow['track_anything_type_id']) . "'>";	
@@ -226,7 +221,7 @@ if ($formid){
 		$spell  = "SELECT form_track_anything_results.id AS result_id, form_track_anything_results.itemid, form_track_anything_results.result, form_track_anything_type.name AS the_name ";
 		$spell .= "FROM form_track_anything_results ";
 		$spell .= "INNER JOIN form_track_anything_type ON form_track_anything_results.itemid = form_track_anything_type.track_anything_type_id ";
-		$spell .= "WHERE track_anything_id = ? AND track_timestamp = ? ";
+		$spell .= "WHERE track_anything_id = ? AND track_timestamp = ? AND form_track_anything_type.active = 1 ";
 		$spell .= "ORDER BY form_track_anything_type.position ASC, the_name ASC ";
 		$query2  = sqlStatement($spell,array($formid ,$thistime));
 		

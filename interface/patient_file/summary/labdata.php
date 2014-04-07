@@ -285,7 +285,7 @@ if($value_select){
 			
 			if($value_count > 1 && !$printable) {
 				echo "<tr><td colspan='7' align='center'>";
-				echo "<input type='button' class='graph_button'  onclick='get_my_graph" . attr($item_graph) . "()' name='' value='" . xla('Plot item') . " \"" . text($the_item) . "\"'>";
+				echo "<input type='button' class='graph_button'  onclick='get_my_graph" . attr($item_graph) . "()' name='' value='" . xla('Plot item') . " \"" . attr($the_item) . "\"'>";
 				echo "</td></tr>";
 			}
 			?>

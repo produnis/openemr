@@ -37,7 +37,7 @@ require_once("../../globals.php");
 <?php
 //retrieve most recent set of labdata.
 $spell = "SELECT procedure_report.date_collected AS thedate, " . 
-			      "procedure_order_code.procedure_code AS theprocedure, " .
+			      "procedure_order_code.procedure_name AS theprocedure, " .
 				  "procedure_order.encounter_id AS theencounter " . 
 			"FROM procedure_report " . 
 			"JOIN procedure_order ON  procedure_report.procedure_order_id = procedure_order.procedure_order_id " . 
@@ -48,7 +48,7 @@ $result=sqlQuery($spell, array($pid) );
     
 if ( !$result ) //If there are no lab data recorded
 { ?>
-  <span class='text'> <?php echo htmlspecialchars(xl("No lab data have been documented."),ENT_NOQUOTES); 
+  <span class='text'> <?php echo htmlspecialchars(xl("No lab data documented."),ENT_NOQUOTES); 
 ?>
   </span> 
 <?php 

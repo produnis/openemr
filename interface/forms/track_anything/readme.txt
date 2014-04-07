@@ -1,9 +1,18 @@
-The form uses "Top-Level-Procedures" to get information about what to track. 
-So anything you wish to track is possible, as long as your desired parameters fit with Procedure-Items.
+After enabling the "track_anything"-form, you need to set up the Tracks.
 
-* Go to "Procedures" => "Configuration" and create a new "Top Level"-procedure.
-* Add any item to this new top-level-procedure that you wish to track
-* Go to any encounter
-* Select "Clinical" => "Track anything"
-* Select the desired Procedure you wish to track.
-* Enter your data
+* Go to any encounter and select "Track anything"
+* click the button "Configure tracks"
+* click the button "Create new Track"
+* give it a "name" and a "description"
+* use "position" to alter the descending order of tracks/items
+* click the "add"-button to add some items to track
+
+* click the "disable" button to hide tracks or items. Note that data of disabled tracks/items will stay in the database. After "enabling" track or items, they will show up again.
+
+
+If some Tracks are configured...
+* got to any encounter,
+* select "Track anything"
+* select the desired track
+* enter your data
+

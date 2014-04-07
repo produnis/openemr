@@ -1390,23 +1390,18 @@ expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel,
 			$widgetTitle = xl("Tracks");
 			$widgetLabel = "track_anything";
 			$widgetButtonLabel = xl("Tracks");
-			$widgetButtonLink = "../../forms/track_anything/create.php";#"../encounter/trend_form.php?formname=labdata";
+			$widgetButtonLink = "../../forms/track_anything/create.php";
 			$widgetButtonClass = "";
+			$widgetAuth = "";  // don't show the button
 			$linkMethod = "html";
 			$bodyClass = "notab";
 			// check to see if any tracks exist
 			$spruch = "SELECT id " .
 				"FROM forms " . 
 				"WHERE pid = ? " .
-				"AND form_name LIKE ? "; 
-			#"ORDER BY procedure_report.date_collected DESC ";
-			$existTracks = sqlQuery($spruch, array($pid, "Track%") );	
-			if ($existTracks) {
-				$widgetAuth = true;
-			}
-			else {
-				$widgetAuth = false;
-			}
+				"AND formdir = ? "; 
+			$existTracks = sqlQuery($spruch, array($pid, "track_anything") );	
+
 			$fixedWidth = false;
 			expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel,
 				$widgetButtonLink, $widgetButtonClass, $linkMethod, $bodyClass,
