@@ -98,12 +98,12 @@ if($dbaction == 'edit'){
 // end edit -----------------------------
 
 //-----------------------------
-if($dbaction == 'delete'){
-		$the_item 	= $_POST['itemid'];
+if($dbaction == 'delete' && acl_check('admin', 'super')){
 		
+		$the_item 	= $_POST['itemid'];
 		$deletespell  = "DELETE FROM form_track_anything_type ";
 		$deletespell .= "WHERE track_anything_type_id = ? ";
-		sqlStatement($deletespell,  $the_item);
+		sqlStatement($deletespell, array($the_item));
 
 		}
 
@@ -307,7 +307,9 @@ while($myrow = sqlFetchArray($result)){
 	} elseif($type_active == '0'){
 		echo "<input type='submit' class='ta_button' name='act' value='" . xla('Enable') . "'>\n";
 	}
-	echo "<input type='submit' class='delete_button' name='delete' value='" . xla('Del') . "'>\n";
+	if(acl_check('admin', 'super')){
+		echo "<input type='submit' class='delete_button' name='delete' value='" . xla('Del') . "'>\n";
+	}
 	echo "<input type='hidden' name='typeid' value='" . attr($type_id) . "'>";
 	echo "</td></tr>\n";
 	echo "</form>\n";
@@ -339,7 +341,9 @@ while($myrow = sqlFetchArray($result)){
 		} elseif($item_active == '0'){
 			echo "<input type='submit' class='ta_button' name='act' value='" . xla('Enable') . "'>\n";
 		}
-		echo "<input type='submit' class='delete_button' name='delete' value='" . xla('Del') . "'>\n";
+		if(acl_check('admin', 'super')){
+			echo "<input type='submit' class='delete_button' name='delete' value='" . xla('Del') . "'>\n";
+		}
 		echo "<input type='hidden' name='typeid' value='" . attr($item_id) . "'>\n";
 		echo "</td></tr>\n";
 		echo "</form>\n";
